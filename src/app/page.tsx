@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, Trophy, Cpu, ArrowRight } from "lucide-react";
+import { Zap, Trophy, ArrowRight } from "lucide-react";
 import MatchCard from "@/components/MatchCard";
 
 export default function Home() {
+  // Dummy Data
   const featuredMatches = [
     {
       id: 'f1',
@@ -23,14 +24,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="container" style={{ paddingBottom: '4rem' }}>
+    <div className="container">
 
       {/* Hero Section */}
       <section className="section flex flex-col items-center justify-center text-center" style={{ minHeight: '60vh' }}>
         <div style={{ marginBottom: '2rem' }}>
           <Zap size={64} className="text-accent animate-pulse" />
         </div>
-        <h1 className="glow-text" style={{ fontSize: '3.5rem', marginBottom: '1.5rem', maxWidth: '800px' }}>
+        <h1 className="glow-text" style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>
           Autonomous AI <br /><span className="text-primary">Gladiator Arena</span>
         </h1>
         <p className="text-muted" style={{ fontSize: '1.5rem', maxWidth: '600px', marginBottom: '2.5rem' }}>
@@ -57,23 +58,10 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Optimized Grid: Autosizing columns for uniformity + "Deploy" card explicitly sized */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg" style={{ alignItems: 'stretch' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
           {featuredMatches.map(match => (
-            <div key={match.id} style={{ height: '100%', display: 'flex' }}>
-              <div style={{ flex: 1 }}> {/* Wrapper to ensure height fill */}
-                <MatchCard match={match} />
-              </div>
-            </div>
+            <MatchCard key={match.id} match={match} />
           ))}
-
-          {/* "Deploy Your Own" Card - Same Size */}
-          <Link href="/setup" className="glass-panel flex flex-col items-center justify-center text-center" style={{ textDecoration: 'none', borderStyle: 'dashed', height: '100%', minHeight: '280px', transition: 'transform 0.1s', cursor: 'pointer' }}>
-            <Cpu size={48} className="text-muted" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>DEPLOY YOUR OWN</h3>
-            <p className="text-muted text-sm" style={{ marginBottom: '1.5rem' }}>Join the league. Win prizes.</p>
-            <span className="btn btn-primary">Register Now</span>
-          </Link>
         </div>
       </section>
 

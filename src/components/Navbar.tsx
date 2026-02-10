@@ -2,22 +2,12 @@
 
 import Link from 'next/link';
 import { useWallet } from '@/context/WalletContext';
-import { Wallet, Menu, X, Cpu, Trophy, BarChart3, TrendingUp, Home, Moon, Sun } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Wallet, Menu, X, Cpu, Trophy, BarChart3, TrendingUp, Gamepad2, Medal } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Navbar() {
     const { isConnected, walletAddress, balance, connectWallet, disconnectWallet } = useWallet();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
-    useEffect(() => {
-        // Check system preference or localStorage could go here
-    }, []);
-
-    const toggleTheme = () => {
-        setIsDarkMode(!isDarkMode);
-        document.body.classList.toggle('dark');
-    };
 
     return (
         <nav className="navbar">
@@ -32,16 +22,19 @@ export default function Navbar() {
                         </span>
                     </Link>
 
-                    {/* Desktop Links - Left Aligned */}
+                    {/* Desktop Links - Reordered: Games, Arena, Prediction, Leaderboard, Register, Profile */}
                     <div className="nav-links">
-                        <Link href="/" className="nav-link">
-                            <Home size={18} /> Home
+                        <Link href="/games" className="nav-link">
+                            <Gamepad2 size={18} /> Games
                         </Link>
                         <Link href="/arena" className="nav-link">
                             <Trophy size={18} /> Arena
                         </Link>
                         <Link href="/prediction" className="nav-link">
                             <TrendingUp size={18} /> Prediction
+                        </Link>
+                        <Link href="/leaderboard" className="nav-link">
+                            <Medal size={18} /> Leaderboard
                         </Link>
                         <Link href="/setup" className="nav-link">
                             <Cpu size={18} /> Register Bot
@@ -52,18 +45,8 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {/* RIGHT: Wallet & Dark Mode */}
+                {/* RIGHT: Wallet */}
                 <div className="flex items-center gap-md">
-                    {/* Dark Mode Toggle */}
-                    <button
-                        onClick={toggleTheme}
-                        className="btn"
-                        style={{ padding: '0.5rem', background: 'transparent', border: 'none', boxShadow: 'none' }}
-                        title="Toggle Dark Mode"
-                    >
-                        {isDarkMode ? <Sun size={20} className="text-accent" /> : <Moon size={20} className="text-main" />}
-                    </button>
-
                     {isConnected ? (
                         <div className="wallet-badge hidden-mobile">
                             <span className="text-accent text-mono font-bold">{balance} CR</span>
@@ -103,15 +86,13 @@ export default function Navbar() {
             {/* Mobile Menu */}
             {isMenuOpen && (
                 <div className="mobile-menu">
-                    <Link href="/" onClick={() => setIsMenuOpen(false)} className="nav-link">Home</Link>
+                    <Link href="/games" onClick={() => setIsMenuOpen(false)} className="nav-link">Games</Link>
                     <Link href="/arena" onClick={() => setIsMenuOpen(false)} className="nav-link">Arena</Link>
                     <Link href="/prediction" onClick={() => setIsMenuOpen(false)} className="nav-link">Prediction</Link>
+                    <Link href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="nav-link">Leaderboard</Link>
                     <Link href="/setup" onClick={() => setIsMenuOpen(false)} className="nav-link">Register Bot</Link>
                     <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="nav-link">Profile</Link>
                     <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
-                        <button onClick={toggleTheme} className="nav-link" style={{ width: '100%', textAlign: 'left', marginBottom: '1rem' }}>
-                            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                        </button>
                         {isConnected ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <div className="text-accent text-mono">{balance} Credits</div>

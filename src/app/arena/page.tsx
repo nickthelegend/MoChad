@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import MatchCard from '@/components/MatchCard';
-import { Swords, Timer, History, Zap, Gamepad2, Brain, Skull, Divide, MousePointer2, Users } from 'lucide-react';
+import { Swords, Timer, History, Zap } from 'lucide-react';
 
 export default function ArenaPage() {
     const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'past'>('live');
@@ -46,45 +46,6 @@ export default function ArenaPage() {
         }
     ];
 
-    const p2pGames = [
-        {
-            title: "Rock Paper Scissors",
-            icon: <Swords size={32} className="text-primary" />,
-            desc: "Pattern detection & randomness. High-frequency betting.",
-            tags: ["Instant", "Elo Ranked"]
-        },
-        {
-            title: "Coin Flip Bluff",
-            icon: <Zap size={32} className="text-accent" />,
-            desc: "Heads or Tails with a twist. Bluff your opponent.",
-            tags: ["Psychology", "Double-or-Nothing"]
-        },
-        {
-            title: "Number Duel (1-10)",
-            icon: <Divide size={32} className="text-secondary" />,
-            desc: "Pick the closest number to the hidden target.",
-            tags: ["Simple", "Strategy"]
-        },
-        {
-            title: "Grid Capture (3x3)",
-            icon: <MousePointer2 size={32} className="text-success" />,
-            desc: "Claim the most territory. Like Tic-Tac-Toe but complex.",
-            tags: ["Territory", "Memory"]
-        },
-        {
-            title: "Turn-Based RPG",
-            icon: <Skull size={32} className="text-error" />,
-            desc: "Attack, Defend, or Charge. Manage your HP.",
-            tags: ["Simulation", "RPG"]
-        },
-        {
-            title: "Trust & Betray",
-            icon: <Users size={32} className="text-muted" />,
-            desc: "Cooperate for rewards or betray for the jackpot.",
-            tags: ["Narrative", "Drama"]
-        }
-    ];
-
     const getMatches = () => {
         if (activeTab === 'live') return liveMatches;
         if (activeTab === 'upcoming') return upcomingMatches;
@@ -95,39 +56,11 @@ export default function ArenaPage() {
         <div className="container" style={{ padding: '3rem 1rem' }}>
             <div className="flex flex-col items-center" style={{ textAlign: 'center', marginBottom: '3rem' }}>
                 <h1 className="glow-text" style={{ fontSize: '3rem' }}>The Arena</h1>
-                <p className="text-muted">Witness AI gladiators fight for dominance and ETH.</p>
+                <p className="text-muted">Witness AI gladiators fight for dominance.</p>
             </div>
 
-            {/* P2P Games Catalog */}
-            <div style={{ marginBottom: '4rem' }}>
-                <h2 className="flex items-center gap-sm mb-4">
-                    <Gamepad2 className="text-accent" /> Available Game Modes
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-                    {p2pGames.map((game, idx) => (
-                        <div key={idx} className="glass-panel hover:bg-surface-hover cursor-pointer transition-transform hover:-translate-y-1">
-                            <div className="flex items-center gap-md mb-2">
-                                {game.icon}
-                                <h3 style={{ margin: 0, fontSize: '1rem' }}>{game.title}</h3>
-                            </div>
-                            <p className="text-sm text-muted mb-2">{game.desc}</p>
-                            <div className="flex gap-sm flex-wrap">
-                                {game.tags.map(tag => (
-                                    <span key={tag} className="text-xs px-2 py-1 border border-border-color bg-background">
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Match Tabs */}
-            <h2 className="flex items-center gap-sm mb-4">
-                <Brain className="text-primary" /> Active Matches
-            </h2>
-            <div className="flex justify-center gap-md" style={{ marginBottom: '2rem' }}>
+            {/* Tabs */}
+            <div className="flex justify-center gap-md" style={{ marginBottom: '3rem' }}>
                 <button
                     onClick={() => setActiveTab('live')}
                     className={`btn ${activeTab === 'live' ? 'btn-primary' : 'btn-secondary'}`}

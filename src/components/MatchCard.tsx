@@ -118,6 +118,15 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onBet }) => {
                     </span>
                 </div>
             )}
+
+            {/* Predict Button */}
+            {!isFinished && (
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
+                    <a href={`/prediction?match=${match.id}`} className="btn btn-primary text-xs" style={{ width: '100%' }}>
+                        Predict Outcome
+                    </a>
+                </div>
+            )}
         </div>
     );
 };

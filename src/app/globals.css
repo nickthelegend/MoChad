@@ -42,20 +42,6 @@
   --spacing-xl: 3rem;
 }
 
-body.dark {
-  --background: #111827;
-  --surface: #1f2937;
-  --surface-hover: #374151;
-  --primary: #ef4444;
-  /* Keep Red */
-  --primary-dark: #b91c1c;
-  --secondary: #3b82f6;
-  --secondary-dark: #1d4ed8;
-  --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --border-color: #e5e7eb;
-}
-
 * {
   box-sizing: border-box;
   padding: 0;
