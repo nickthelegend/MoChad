@@ -10,40 +10,41 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[var(--glass-border)] bg-[rgba(10,10,15,0.8)] backdrop-blur-md">
-            <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 text-2xl font-bold tracking-tighter hover:opacity-80 transition-opacity">
-                    <Cpu className="text-[var(--primary)]" size={32} />
-                    <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+        <nav className="navbar">
+            <div className="nav-container">
+                <Link href="/" className="nav-brand">
+                    <Cpu className="text-primary" size={32} style={{ color: 'var(--primary)' }} />
+                    <span className="text-gradient">
                         CLAW HUB
                     </span>
                 </Link>
 
                 {/* Desktop Links */}
-                <div className="hidden md:flex items-center gap-8">
-                    <Link href="/arena" className="text-[var(--text-muted)] hover:text-white transition-colors flex items-center gap-1">
+                <div className="nav-links">
+                    <Link href="/arena" className="nav-link">
                         <Trophy size={18} /> Arena
                     </Link>
-                    <Link href="/setup" className="text-[var(--text-muted)] hover:text-white transition-colors flex items-center gap-1">
+                    <Link href="/setup" className="nav-link">
                         <Cpu size={18} /> Register Bot
                     </Link>
-                    <Link href="/profile" className="text-[var(--text-muted)] hover:text-white transition-colors flex items-center gap-1">
+                    <Link href="/profile" className="nav-link">
                         <BarChart3 size={18} /> Profile
                     </Link>
                 </div>
 
                 {/* Wallet Button */}
-                <div className="hidden md:flex items-center gap-4">
+                <div className="nav-links"> {/* Reusing nav-links layout for buttons */}
                     {isConnected ? (
-                        <div className="flex items-center gap-2 bg-[rgba(255,255,255,0.05)] border border-[var(--glass-border)] rounded-full px-4 py-1.5">
-                            <span className="text-sm font-mono text-[var(--accent)] font-bold">{balance} CR</span>
-                            <span className="text-xs text-[var(--text-muted)]">|</span>
-                            <span className="text-xs font-mono text-gray-300" title={walletAddress!}>
+                        <div className="wallet-badge">
+                            <span className="text-accent text-mono font-bold">{balance} CR</span>
+                            <span className="text-muted">|</span>
+                            <span className="text-mono text-xs" title={walletAddress!}>
                                 {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
                             </span>
                             <button
                                 onClick={disconnectWallet}
-                                className="ml-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+                                className="text-error text-xs"
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: '8px' }}
                             >
                                 Exit
                             </button>
@@ -51,7 +52,8 @@ export default function Navbar() {
                     ) : (
                         <button
                             onClick={connectWallet}
-                            className="btn btn-primary text-sm py-2 px-4 shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+                            className="btn btn-primary text-sm"
+                            style={{ padding: '0.5rem 1rem' }}
                         >
                             <Wallet size={18} />
                             Connect Wallet
@@ -61,7 +63,7 @@ export default function Navbar() {
 
                 {/* Mobile Menu Toggle */}
                 <button
-                    className="md:hidden text-[var(--text-main)]"
+                    className="mobile-menu-btn"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -70,19 +72,19 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="md:hidden md:hidden absolute top-16 left-0 right-0 bg-[var(--background)] border-b border-[var(--glass-border)] p-4 flex flex-col gap-4">
-                    <Link href="/arena" onClick={() => setIsMenuOpen(false)} className="text-[var(--text-muted)] hover:text-white">Arena</Link>
-                    <Link href="/setup" onClick={() => setIsMenuOpen(false)} className="text-[var(--text-muted)] hover:text-white">Register Bot</Link>
-                    <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="text-[var(--text-muted)] hover:text-white">Profile</Link>
-                    <div className="pt-4 border-t border-[var(--glass-border)]">
+                <div className="mobile-menu">
+                    <Link href="/arena" onClick={() => setIsMenuOpen(false)} className="nav-link">Arena</Link>
+                    <Link href="/setup" onClick={() => setIsMenuOpen(false)} className="nav-link">Register Bot</Link>
+                    <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="nav-link">Profile</Link>
+                    <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
                         {isConnected ? (
-                            <div className="flex flex-col gap-2">
-                                <div className="font-mono text-[var(--accent)]">{balance} Credits</div>
-                                <div className="font-mono text-xs">{walletAddress}</div>
-                                <button onClick={disconnectWallet} className="text-red-400 text-sm">Disconnect</button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div className="text-accent text-mono">{balance} Credits</div>
+                                <div className="text-mono text-xs">{walletAddress}</div>
+                                <button onClick={disconnectWallet} className="text-error">Disconnect</button>
                             </div>
                         ) : (
-                            <button onClick={connectWallet} className="btn btn-primary w-full">Connect Wallet</button>
+                            <button onClick={connectWallet} className="btn btn-primary" style={{ width: '100%' }}>Connect Wallet</button>
                         )}
                     </div>
                 </div>

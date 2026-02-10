@@ -28,12 +28,12 @@ export default function BotSetupPage() {
 
     if (!isConnected) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="glass-panel p-8 text-center max-w-md w-full">
-                    <Zap size={48} className="mx-auto text-[var(--primary)] mb-4" />
-                    <h1 className="text-2xl font-bold mb-2">Connect Wallet Required</h1>
-                    <p className="text-[var(--text-muted)] mb-6">You need to connect your wallet to register a Claw Bot.</p>
-                    <button onClick={connectWallet} className="btn btn-primary w-full">
+            <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="glass-panel" style={{ textAlign: 'center', maxWidth: '400px', width: '100%' }}>
+                    <Zap size={48} className="text-primary" style={{ margin: '0 auto 1rem auto' }} />
+                    <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Connect Wallet Required</h1>
+                    <p className="text-muted" style={{ marginBottom: '1.5rem' }}>You need to connect your wallet to register a Claw Bot.</p>
+                    <button onClick={connectWallet} className="btn btn-primary" style={{ width: '100%' }}>
                         Connect Wallet
                     </button>
                 </div>
@@ -43,21 +43,21 @@ export default function BotSetupPage() {
 
     if (registered) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="glass-panel p-8 text-center max-w-md w-full border border-[var(--success)]">
-                    <div className="w-16 h-16 bg-[rgba(16,185,129,0.2)] rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--success)]">
+            <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="glass-panel" style={{ textAlign: 'center', maxWidth: '400px', width: '100%', borderColor: 'var(--success)' }}>
+                    <div style={{ width: 64, height: 64, background: 'rgba(16,185,129,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto', color: 'var(--success)' }}>
                         <Bot size={32} />
                     </div>
-                    <h1 className="text-2xl font-bold mb-2 text-white">Bot Deployed!</h1>
-                    <p className="text-[var(--text-muted)] mb-6">
-                        <span className="text-[var(--primary)]">{formData.name}</span> has been registered to the arena.
+                    <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Bot Deployed!</h1>
+                    <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
+                        <span className="text-primary">{formData.name}</span> has been registered to the arena.
                         Next match scheduled in ~10 hours.
                     </p>
-                    <div className="flex gap-4">
-                        <Link href="/arena" className="btn btn-primary flex-1">
+                    <div className="flex gap-md">
+                        <Link href="/arena" className="btn btn-primary" style={{ flex: 1 }}>
                             Go to Arena
                         </Link>
-                        <Link href="/profile" className="btn btn-secondary flex-1">
+                        <Link href="/profile" className="btn btn-secondary" style={{ flex: 1 }}>
                             View Profile
                         </Link>
                     </div>
@@ -67,16 +67,16 @@ export default function BotSetupPage() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
-            <h1 className="text-4xl font-bold mb-2">Deploy New Bot</h1>
-            <p className="text-[var(--text-muted)] mb-8">Configure your agent's identity and strategy.</p>
+        <div className="container" style={{ padding: '3rem 1rem', maxWidth: '1000px' }}>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Deploy New Bot</h1>
+            <p className="text-muted" style={{ marginBottom: '2rem' }}>Configure your agent's identity and strategy.</p>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-xl">
                 {/* Form Section */}
-                <div className="glass-panel p-6">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                <div className="glass-panel">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-lg">
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Bot Name</label>
+                            <label className="text-sm font-bold" style={{ display: 'block', marginBottom: '0.5rem' }}>Bot Name</label>
                             <input
                                 type="text"
                                 required
@@ -88,9 +88,10 @@ export default function BotSetupPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Lore / Description</label>
+                            <label className="text-sm font-bold" style={{ display: 'block', marginBottom: '0.5rem' }}>Lore / Description</label>
                             <textarea
-                                className="input-field min-h-[100px]"
+                                className="input-field"
+                                style={{ minHeight: '100px', resize: 'vertical' }}
                                 placeholder="Backstory or logic description..."
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -98,28 +99,67 @@ export default function BotSetupPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Risk Profile</label>
-                            <div className="grid grid-cols-3 gap-2">
+                            <label className="text-sm font-bold" style={{ display: 'block', marginBottom: '0.5rem' }}>Risk Profile</label>
+                            <div className="grid grid-cols-3 gap-sm">
                                 <button
                                     type="button"
-                                    className={`p-3 rounded-lg border text-sm font-semibold flex flex-col items-center gap-1 transition-all ${formData.strategy === 'aggressive' ? 'bg-[var(--primary)] border-transparent text-white' : 'border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'}`}
+                                    className="glass-panel"
+                                    style={{
+                                        padding: '1rem',
+                                        borderRadius: 'var(--radius-sm)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        textAlign: 'center',
+                                        background: formData.strategy === 'aggressive' ? 'var(--primary)' : 'transparent',
+                                        borderColor: formData.strategy === 'aggressive' ? 'var(--primary)' : 'var(--glass-border)',
+                                        color: formData.strategy === 'aggressive' ? 'white' : 'var(--text-muted)',
+                                        cursor: 'pointer'
+                                    }}
                                     onClick={() => setFormData({ ...formData, strategy: 'aggressive' })}
                                 >
-                                    <Sword size={18} /> Aggressive
+                                    <Sword size={18} /> <span className="text-xs font-bold">Aggressive</span>
                                 </button>
                                 <button
                                     type="button"
-                                    className={`p-3 rounded-lg border text-sm font-semibold flex flex-col items-center gap-1 transition-all ${formData.strategy === 'balanced' ? 'bg-[var(--primary)] border-transparent text-white' : 'border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'}`}
+                                    className="glass-panel"
+                                    style={{
+                                        padding: '1rem',
+                                        borderRadius: 'var(--radius-sm)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        textAlign: 'center',
+                                        background: formData.strategy === 'balanced' ? 'var(--primary)' : 'transparent',
+                                        borderColor: formData.strategy === 'balanced' ? 'var(--primary)' : 'var(--glass-border)',
+                                        color: formData.strategy === 'balanced' ? 'white' : 'var(--text-muted)',
+                                        cursor: 'pointer'
+                                    }}
                                     onClick={() => setFormData({ ...formData, strategy: 'balanced' })}
                                 >
-                                    <Shield size={18} /> Balanced
+                                    <Shield size={18} /> <span className="text-xs font-bold">Balanced</span>
                                 </button>
                                 <button
                                     type="button"
-                                    className={`p-3 rounded-lg border text-sm font-semibold flex flex-col items-center gap-1 transition-all ${formData.strategy === 'random' ? 'bg-[var(--primary)] border-transparent text-white' : 'border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'}`}
+                                    className="glass-panel"
+                                    style={{
+                                        padding: '1rem',
+                                        borderRadius: 'var(--radius-sm)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        textAlign: 'center',
+                                        background: formData.strategy === 'random' ? 'var(--primary)' : 'transparent',
+                                        borderColor: formData.strategy === 'random' ? 'var(--primary)' : 'var(--glass-border)',
+                                        color: formData.strategy === 'random' ? 'white' : 'var(--text-muted)',
+                                        cursor: 'pointer'
+                                    }}
                                     onClick={() => setFormData({ ...formData, strategy: 'random' })}
                                 >
-                                    <Zap size={18} /> Random
+                                    <Zap size={18} /> <span className="text-xs font-bold">Random</span>
                                 </button>
                             </div>
                         </div>
@@ -127,7 +167,8 @@ export default function BotSetupPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="btn btn-primary w-full mt-4"
+                            className="btn btn-primary"
+                            style={{ width: '100%', marginTop: '1rem' }}
                         >
                             {isSubmitting ? 'Registering On-Chain...' : 'Register Bot (0.05 ETH)'}
                         </button>
@@ -136,31 +177,34 @@ export default function BotSetupPage() {
 
                 {/* Info / Prompt Section */}
                 <div>
-                    <div className="glass-panel p-6 mb-6">
-                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                            <Zap size={20} className="text-[var(--accent)]" />
+                    <div className="glass-panel" style={{ marginBottom: '1.5rem' }}>
+                        <h3 className="font-bold text-lg flex items-center gap-sm" style={{ marginBottom: '1rem' }}>
+                            <Zap size={20} className="text-accent" />
                             Required Prompt
                         </h3>
-                        <p className="text-sm text-[var(--text-muted)] mb-4">
+                        <p className="text-sm text-muted" style={{ marginBottom: '1rem' }}>
                             Ensure your local agent is running with this system instruction before registering.
                         </p>
-                        <div className="bg-[#0f0f16] p-4 rounded-lg border border-[var(--glass-border)] font-mono text-xs text-gray-400 relative">
-                            <pre className="whitespace-pre-wrap">
+                        <div style={{ background: '#0f0f16', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', position: 'relative' }}>
+                            <pre className="text-mono text-xs text-muted" style={{ whiteSpace: 'pre-wrap' }}>
                                 {`You are a Claw Bot.
 You will receive game state data.
 Your goal is to maximize win rate.
 Respond ONLY with valid moves.
 No explanations.`}
                             </pre>
-                            <button className="absolute top-2 right-2 text-[var(--text-muted)] hover:text-white">
+                            <button
+                                className="text-muted hover:text-white"
+                                style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'none', border: 'none', cursor: 'pointer' }}
+                            >
                                 <Copy size={14} />
                             </button>
                         </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[var(--glass-border)]">
-                        <h4 className="font-bold text-sm mb-2">How it works</h4>
-                        <ul className="text-sm text-[var(--text-muted)] space-y-2 list-disc pl-4">
+                    <div style={{ padding: '1rem', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)' }}>
+                        <h4 className="font-bold text-sm" style={{ marginBottom: '0.5rem' }}>How it works</h4>
+                        <ul className="text-sm text-muted" style={{ paddingLeft: '1.5rem', lineHeight: 1.6 }}>
                             <li>Registration fee locks into the prize pool.</li>
                             <li>Bots must be online during their scheduled match window (every 10h).</li>
                             <li>Winners take 90% of the pot. 10% goes to the DAO.</li>

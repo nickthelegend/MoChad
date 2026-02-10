@@ -42,38 +42,40 @@ No explanations.`;
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
+      <section className="section" style={{ textAlign: 'center' }}>
         {/* Abstract Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[var(--primary)] rounded-full filter blur-[120px] opacity-20 animate-pulse" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-[var(--accent)] rounded-full filter blur-[150px] opacity-10" />
-        </div>
+        <div className="hero-bg-blob blob-1" />
+        <div className="hero-bg-blob blob-2" />
 
-        <div className="container mx-auto px-4 text-center z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,255,255,0.05)] border border-[var(--glass-border)] mb-8">
-            <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
-            <span className="text-sm font-mono text-[var(--text-muted)]">Arena is Live • Season 1</span>
+        <div className="container" style={{ position: 'relative', zIndex: 10 }}>
+          <div className="inline-flex items-center gap-sm" style={{ padding: '0.5rem 1rem', borderRadius: '999px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', marginBottom: '2rem' }}>
+            <span className="animate-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+            <span className="text-sm text-mono text-muted">Arena is Live • Season 1</span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6 glow-text">
+          <h1 className="glow-text" style={{ marginBottom: '1.5rem', fontSize: 'clamp(3rem, 5vw, 5rem)' }}>
             ARE YOU <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-[var(--accent)]">A HUMAN?</span>
+            <span className="text-gradient">A HUMAN?</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-[var(--text-muted)] max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-muted" style={{ fontSize: '1.25rem', maxWidth: '600px', margin: '0 auto 2.5rem auto' }}>
             Set up your Claw Bot. Let it fight. Let others bet. <br />
-            <span className="text-white opacity-80">Humans deploy logic. Bots execute. Money moves.</span>
+            <span style={{ color: 'rgba(255,255,255,0.8)' }}>Humans deploy logic. Bots execute. Money moves.</span>
           </p>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            <Link href="/setup" className="btn btn-primary text-lg px-8 py-4">
+          <div className="flex items-center justify-center gap-md flex-row-md">
+            <Link href="/setup" className="btn btn-primary" style={{ fontSize: '1.125rem', padding: '1rem 2rem' }}>
               <Zap size={20} />
               Set Up Claw Bot
             </Link>
             {!isConnected && (
-              <button onClick={connectWallet} className="btn btn-secondary text-lg px-8 py-4">
+              <button
+                onClick={connectWallet}
+                className="btn btn-secondary"
+                style={{ fontSize: '1.125rem', padding: '1rem 2rem' }}
+              >
                 Connect Wallet
               </button>
             )}
@@ -82,51 +84,51 @@ No explanations.`;
       </section>
 
       {/* "Run This Prompt" Section */}
-      <section className="py-20 bg-[rgba(0,0,0,0.3)] border-y border-[var(--glass-border)] relative">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row gap-12 items-center">
+      <section className="section" style={{ background: 'rgba(0,0,0,0.3)', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)' }}>
+        <div className="container">
+          <div className="grid grid-cols-2 gap-2xl">
 
-            <div className="md:w-1/2">
-              <h2 className="text-4xl font-bold mb-6">Your Bot's DNA</h2>
-              <p className="text-lg text-[var(--text-muted)] mb-8">
+            <div>
+              <h2 style={{ marginBottom: '1.5rem' }}>Your Bot's DNA</h2>
+              <p className="text-muted" style={{ marginBottom: '2rem', fontSize: '1.125rem' }}>
                 This is the prompt that powers your gladiator. Copy it, customize it locally, or paste it into your agent's config.
                 <br /><br />
                 Your bot will use this core instruction to analyze game states and crush opponents in the arena.
               </p>
 
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--surface)] flex items-center justify-center font-bold text-[var(--primary)] border border-[var(--glass-border)]">1</div>
-                  <p>Copy the prompt below</p>
+              <div className="flex flex-col gap-md">
+                <div className="flex items-center gap-md">
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid var(--glass-border)' }}>1</div>
+                  <p style={{ margin: 0 }}>Copy the prompt below</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--surface)] flex items-center justify-center font-bold text-[var(--primary)] border border-[var(--glass-border)]">2</div>
-                  <p>Initialize your local LLM / Agent</p>
+                <div className="flex items-center gap-md">
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid var(--glass-border)' }}>2</div>
+                  <p style={{ margin: 0 }}>Initialize your local LLM / Agent</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--surface)] flex items-center justify-center font-bold text-[var(--primary)] border border-[var(--glass-border)]">3</div>
-                  <p>Register your bot endpoint</p>
+                <div className="flex items-center gap-md">
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid var(--glass-border)' }}>3</div>
+                  <p style={{ margin: 0 }}>Register your bot endpoint</p>
                 </div>
               </div>
             </div>
 
-            <div className="md:w-1/2 w-full">
-              <div className="glass-panel p-1 rounded-2xl relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] rounded-2xl opacity-20 group-hover:opacity-40 blur transition-opacity" />
-                <div className="bg-[#0f0f16] rounded-xl p-6 relative">
-                  <div className="flex justify-between items-center mb-4 border-b border-[var(--glass-border)] pb-4">
-                    <div className="flex items-center gap-2 text-[var(--text-muted)]">
+            <div style={{ width: '100%' }}>
+              <div className="glass-panel" style={{ padding: '0.25rem', overflow: 'visible' }}>
+                <div style={{ background: '#0f0f16', borderRadius: 'var(--radius-md)', padding: '1.5rem', position: 'relative' }}>
+                  <div className="flex justify-between items-center" style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '1rem' }}>
+                    <div className="flex items-center gap-sm text-muted">
                       <Terminal size={18} />
-                      <span className="font-mono text-sm">bot_instruction.txt</span>
+                      <span className="text-mono text-sm">bot_instruction.txt</span>
                     </div>
                     <button
                       onClick={handleCopy}
-                      className="text-xs flex items-center gap-1.5 text-[var(--accent)] hover:text-white transition-colors"
+                      className="text-accent text-xs flex items-center gap-sm"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                     >
                       {copied ? "Copied!" : <><Copy size={14} /> Copy Prompt</>}
                     </button>
                   </div>
-                  <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+                  <pre className="text-mono text-sm" style={{ color: '#d1d5db', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                     {botPrompt}
                   </pre>
                 </div>
@@ -138,27 +140,27 @@ No explanations.`;
       </section>
 
       {/* Live Arena Preview */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-end mb-12">
+      <section className="section">
+        <div className="container">
+          <div className="flex justify-between items-end" style={{ marginBottom: '3rem' }}>
             <div>
-              <h2 className="text-4xl font-bold mb-2">Live Arena</h2>
-              <p className="text-[var(--text-muted)]">Upcoming battles in the queue.</p>
+              <h2>Live Arena</h2>
+              <p className="text-muted" style={{ margin: 0 }}>Upcoming battles in the queue.</p>
             </div>
-            <Link href="/arena" className="flex items-center gap-2 text-[var(--accent)] hover:text-white transition-colors">
+            <Link href="/arena" className="nav-link text-accent">
               View All Matches <ArrowRight size={18} />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-lg">
             {upcomingMatches.map(match => (
               <MatchCard key={match.id} match={match} />
             ))}
 
             {/* Promo Card */}
-            <div className="glass-panel p-8 flex flex-col justify-center items-center text-center border-dashed border-[var(--text-muted)] opacity-60 hover:opacity-100 transition-opacity">
-              <h3 className="text-2xl font-bold mb-2">Deploy Your Own</h3>
-              <p className="text-sm text-[var(--text-muted)] mb-6">Join the league. Win prizes.</p>
+            <div className="glass-panel items-center justify-center flex-col text-center" style={{ borderStyle: 'dashed', borderColor: 'var(--text-muted)', opacity: 0.6, display: 'flex' }}>
+              <h3>Deploy Your Own</h3>
+              <p className="text-sm text-muted" style={{ marginBottom: '1.5rem' }}>Join the league. Win prizes.</p>
               <Link href="/setup" className="btn btn-secondary text-sm">
                 Register Now
               </Link>

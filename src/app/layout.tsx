@@ -18,7 +18,7 @@ export default function RootLayout({
       <body>
         <WalletProvider>
           <Navbar />
-          <main className="pt-20 min-h-screen">
+          <main className="main-content">
             {children}
           </main>
         </WalletProvider>

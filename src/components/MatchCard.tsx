@@ -37,48 +37,45 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onBet }) => {
     };
 
     return (
-        <div className="glass-panel p-6 relative overflow-hidden group hover:border-[var(--primary)] transition-colors">
-            {/* Background Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-[var(--primary)] opacity-[0.05] filter blur-[50px] group-hover:opacity-[0.1] transition-opacity" />
-
+        <div className="match-card glass-panel" style={{ padding: '1.5rem' }}>
             {/* Header */}
-            <div className="flex justify-between items-center mb-6 relative z-10">
-                <div className="flex items-center gap-2">
+            <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem', position: 'relative', zIndex: 10 }}>
+                <div className="flex items-center gap-sm">
                     {isLive && (
-                        <span className="flex items-center gap-1.5 text-xs font-bold text-red-500 animate-pulse uppercase tracking-wider">
-                            <span className="w-2 h-2 rounded-full bg-red-500" /> Live
+                        <span className="flex items-center gap-sm text-xs font-bold text-error uppercase animate-pulse">
+                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--error)' }} /> Live
                         </span>
                     )}
                     {isFinished && (
-                        <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Finished</span>
+                        <span className="text-xs font-bold text-muted uppercase">Finished</span>
                     )}
                     {!isLive && !isFinished && (
-                        <span className="flex items-center gap-1.5 text-xs font-bold text-[var(--accent)] uppercase tracking-wider">
+                        <span className="flex items-center gap-sm text-xs font-bold text-accent uppercase">
                             <Timer size={14} /> Upcoming
                         </span>
                     )}
                 </div>
-                <div className="text-xs font-mono text-[var(--text-muted)]">
+                <div className="text-xs text-mono text-muted">
                     {formatDate(match.scheduledFor)}
                 </div>
             </div>
 
             {/* VS Section */}
-            <div className="flex items-center justify-between relative z-10">
+            <div className="competitor-row">
                 {/* Bot A */}
-                <div className={`flex flex-col items-center gap-3 w-1/3 ${match.winnerId === match.botA.id ? 'text-[var(--primary)]' : ''}`}>
-                    <div className={`w-16 h-16 rounded-2xl bg-[var(--surface)] border border-[var(--glass-border)] flex items-center justify-center relative overflow-hidden ${match.winnerId === match.botA.id ? 'border-[var(--primary)] shadow-[0_0_15px_var(--primary-glow)]' : ''}`}>
-                        {match.winnerId === match.botA.id && <div className="absolute inset-0 bg-[var(--primary)] opacity-10" />}
+                <div className={`competitor ${match.winnerId === match.botA.id ? 'winner-text' : ''}`}>
+                    <div className={`avatar ${match.winnerId === match.botA.id ? 'winner' : ''}`}>
                         <User size={32} strokeWidth={1.5} />
                     </div>
-                    <div className="text-center w-full">
-                        <h3 className="font-bold text-lg leading-tight truncate w-full">{match.botA.name}</h3>
-                        {match.botA.owner && <p className="text-xs text-[var(--text-muted)] truncate mx-auto">{match.botA.owner}</p>}
+                    <div style={{ width: '100%' }}>
+                        <h3 className="font-bold text-lg" style={{ marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.botA.name}</h3>
+                        {match.botA.owner && <p className="text-xs text-muted" style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.botA.owner}</p>}
                     </div>
                     {!isFinished && onBet && (
                         <button
                             onClick={() => onBet(match.id, match.botA.id)}
-                            className="mt-2 text-xs py-1 px-3 rounded-full border border-[var(--glass-border)] hover:bg-[var(--primary)] hover:border-transparent transition-all"
+                            className="btn btn-secondary text-xs"
+                            style={{ padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)' }}
                         >
                             Vote A
                         </button>
@@ -86,25 +83,25 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onBet }) => {
                 </div>
 
                 {/* VS Divider */}
-                <div className="flex flex-col items-center justify-center gap-1">
-                    <Swords className="text-[var(--text-muted)] opacity-50" size={24} />
-                    <div className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-widest">VS</div>
+                <div className="flex flex-col items-center justify-center gap-sm">
+                    <Swords className="text-muted" size={24} style={{ opacity: 0.5 }} />
+                    <div className="vs-badge">VS</div>
                 </div>
 
                 {/* Bot B */}
-                <div className={`flex flex-col items-center gap-3 w-1/3 ${match.winnerId === match.botB.id ? 'text-[var(--primary)]' : ''}`}>
-                    <div className={`w-16 h-16 rounded-2xl bg-[var(--surface)] border border-[var(--glass-border)] flex items-center justify-center relative overflow-hidden ${match.winnerId === match.botB.id ? 'border-[var(--primary)] shadow-[0_0_15px_var(--primary-glow)]' : ''}`}>
-                        {match.winnerId === match.botB.id && <div className="absolute inset-0 bg-[var(--primary)] opacity-10" />}
+                <div className={`competitor ${match.winnerId === match.botB.id ? 'winner-text' : ''}`}>
+                    <div className={`avatar ${match.winnerId === match.botB.id ? 'winner' : ''}`}>
                         <User size={32} strokeWidth={1.5} />
                     </div>
-                    <div className="text-center w-full">
-                        <h3 className="font-bold text-lg leading-tight truncate w-full">{match.botB.name}</h3>
-                        {match.botB.owner && <p className="text-xs text-[var(--text-muted)] truncate mx-auto">{match.botB.owner}</p>}
+                    <div style={{ width: '100%' }}>
+                        <h3 className="font-bold text-lg" style={{ marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.botB.name}</h3>
+                        {match.botB.owner && <p className="text-xs text-muted" style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.botB.owner}</p>}
                     </div>
                     {!isFinished && onBet && (
                         <button
                             onClick={() => onBet(match.id, match.botB.id)}
-                            className="mt-2 text-xs py-1 px-3 rounded-full border border-[var(--glass-border)] hover:bg-[var(--primary)] hover:border-transparent transition-all"
+                            className="btn btn-secondary text-xs"
+                            style={{ padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)' }}
                         >
                             Vote B
                         </button>
@@ -114,7 +111,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onBet }) => {
 
             {/* Winner Overlay for finished games */}
             {isFinished && match.winnerId && (
-                <div className="mt-6 pt-4 border-t border-[var(--glass-border)] flex items-center justify-center gap-2 text-[var(--primary)]">
+                <div className="flex items-center justify-center gap-sm text-primary" style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
                     <Trophy size={16} />
                     <span className="font-bold text-sm">
                         Winner: {match.winnerId === match.botA.id ? match.botA.name : match.botB.name}
