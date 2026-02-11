@@ -1,8 +1,9 @@
-/* eslint-disable @next/next/no-page-custom-font */
 import "./globals.css";
+import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
 import { WalletProvider } from "@/context/WalletContext";
 import Navbar from "@/components/Navbar";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "Claw Hub - Pixel Arena",
@@ -20,12 +21,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <WalletProvider>
-          <Navbar />
-          <main className="main-content">
-            {children}
-          </main>
-        </WalletProvider>
+        <Providers>
+          <WalletProvider>
+            <Navbar />
+            <main className="main-content">
+              {children}
+            </main>
+          </WalletProvider>
+        </Providers>
       </body>
     </html>
   );

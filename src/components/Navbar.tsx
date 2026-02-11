@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { useWallet } from '@/context/WalletContext';
 import { Wallet, Menu, X, Cpu, Trophy, BarChart3, TrendingUp, Gamepad2, Medal } from 'lucide-react';
 import { useState } from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Navbar() {
-    const { isConnected, walletAddress, balance, connectWallet, disconnectWallet } = useWallet();
+    const { isConnected, balance } = useWallet();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
@@ -22,7 +23,7 @@ export default function Navbar() {
                         </span>
                     </Link>
 
-                    {/* Desktop Links - Reordered: Games, Arena, Prediction, Leaderboard, Register, Profile */}
+                    {/* Desktop Links */}
                     <div className="nav-links">
                         <Link href="/games" className="nav-link">
                             <Gamepad2 size={18} /> Games
@@ -47,31 +48,19 @@ export default function Navbar() {
 
                 {/* RIGHT: Wallet */}
                 <div className="flex items-center gap-md">
-                    {isConnected ? (
-                        <div className="wallet-badge hidden-mobile">
+                    {isConnected && (
+                        <div className="wallet-badge hidden-mobile" style={{ background: 'var(--glass-bg)', padding: '4px 12px', border: '1px solid var(--glass-border)' }}>
                             <span className="text-accent text-mono font-bold">{balance} CR</span>
-                            <span className="text-muted">|</span>
-                            <span className="text-mono text-xs" title={walletAddress!}>
-                                {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
-                            </span>
-                            <button
-                                onClick={disconnectWallet}
-                                className="text-error text-xs"
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: '8px' }}
-                            >
-                                Exit
-                            </button>
                         </div>
-                    ) : (
-                        <button
-                            onClick={connectWallet}
-                            className="btn btn-primary text-sm hidden-mobile"
-                            style={{ padding: '0.5rem 1rem' }}
-                        >
-                            <Wallet size={18} />
-                            Connect
-                        </button>
                     )}
+
+                    <div className="hidden-mobile">
+                        <ConnectButton
+                            accountStatus="address"
+                            chainStatus="icon"
+                            showBalance={false}
+                        />
+                    </div>
 
                     {/* Mobile Menu Toggle */}
                     <button
@@ -92,16 +81,8 @@ export default function Navbar() {
                     <Link href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="nav-link">Leaderboard</Link>
                     <Link href="/setup" onClick={() => setIsMenuOpen(false)} className="nav-link">Register Bot</Link>
                     <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="nav-link">Profile</Link>
-                    <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
-                        {isConnected ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <div className="text-accent text-mono">{balance} Credits</div>
-                                <div className="text-mono text-xs">{walletAddress}</div>
-                                <button onClick={disconnectWallet} className="text-error">Disconnect</button>
-                            </div>
-                        ) : (
-                            <button onClick={connectWallet} className="btn btn-primary" style={{ width: '100%' }}>Connect Wallet</button>
-                        )}
+                    <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center' }}>
+                        <ConnectButton />
                     </div>
                 </div>
             )}

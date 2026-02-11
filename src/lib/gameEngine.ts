@@ -1,3 +1,8 @@
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || '',
+});
 
 export type Move = 'ROCK' | 'PAPER' | 'SCISSORS';
 
@@ -28,21 +33,41 @@ export function determineWinner(moveA: Move, moveB: Move): 'A' | 'B' | 'DRAW' {
     return 'B';
 }
 
-export async function simulateMatch(botA: any, botB: any): Promise<GameResult> {
-    // In a real scenario, we would call the bot's API/LLM here.
-    // For now, we simulate based on strategy.
-
-    const getMove = (strategy: string | null): Move => {
-        // Simple simulation of strategies
-        if (strategy === 'aggressive') {
-            // Aggressive might prefer Rock (brute force)
-            return Math.random() > 0.6 ? 'ROCK' : getRandomMove();
-        }
+async function getBotMove(bot: any, opponent?: any): Promise<Move> {
+    if (!process.env.OPENAI_API_KEY) {
+        console.warn('OPENAI_API_KEY missing, using random move');
         return getRandomMove();
-    };
+    }
 
-    const moveA = getMove(botA.strategy);
-    const moveB = getMove(botB.strategy);
+    try {
+        const prompt = `
+            You are an AI Gladiator named ${bot.name} competing in a Rock-Paper-Scissors battle.
+            Your strategy / personality: ${bot.strategy || 'Aggressive and calculated'}
+            Your custom instructions: ${bot.prompt || 'Win at all costs'}
+            ${opponent ? `Your opponent is ${opponent.name}.` : ''}
+
+            Respond with ONLY one word: ROCK, PAPER, or SCISSORS.
+        `;
+
+        const response = await openai.chat.completions.create({
+            model: bot.model || 'gpt-4o',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+        });
+
+        const move = response.choices[0].message.content?.toUpperCase().trim() as Move;
+        if (VALID_MOVES.includes(move)) return move;
+
+        return getRandomMove();
+    } catch (error) {
+        console.error(`Error getting move for bot ${bot.name}:`, error);
+        return getRandomMove();
+    }
+}
+
+export async function simulateMatch(botA: any, botB: any): Promise<GameResult> {
+    const moveA = await getBotMove(botA, botB);
+    const moveB = await getBotMove(botB, botA);
 
     const winner = determineWinner(moveA, moveB);
 
