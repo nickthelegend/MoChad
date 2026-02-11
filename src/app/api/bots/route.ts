@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseClient';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function POST(req: Request) {
     try {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
                 .insert({ walletAddress: owner })
                 .select()
                 .single();
-            
+
             if (createError) throw createError;
             user = newUser;
         } else if (userError) {
@@ -62,7 +62,7 @@ export async function GET(req: Request) {
             .order('createdAt', { ascending: false });
 
         if (error) throw error;
-        
+
         return NextResponse.json({ bots });
     } catch (error: any) {
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

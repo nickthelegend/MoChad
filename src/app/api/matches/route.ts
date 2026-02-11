@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseClient';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function GET(req: Request) {
     try {
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
             .order('scheduledFor', { ascending: true });
 
         if (error) throw error;
-        
+
         return NextResponse.json({ matches });
     } catch (error: any) {
         console.error('Error fetching matches:', error);

@@ -1,5 +1,5 @@
 
-import { supabaseAdmin } from './supabaseClient';
+import { supabaseAdmin } from './supabaseAdmin';
 
 export async function settleBets(matchId: string, winnerId: string | null) {
     try {

@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseClient';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { simulateMatch } from '@/lib/gameEngine';
 
 export async function POST(req: Request) {
