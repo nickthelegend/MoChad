@@ -1,127 +1,160 @@
+
 "use client";
 
+import { useState, useEffect } from 'react';
+import { User, Cpu, Wallet, Zap, Trophy, TrendingUp } from 'lucide-react';
 import { useWallet } from '@/context/WalletContext';
-import BotCard from '@/components/BotCard';
-import Link from 'next/link';
-import { Ghost, Trophy, Wallet } from 'lucide-react';
+
+interface Bot {
+    id: string;
+    name: string;
+    wins: number;
+    losses: number;
+    elo: number;
+    status: string;
+}
 
 export default function ProfilePage() {
-    const { isConnected, balance, walletAddress, connectWallet } = useWallet();
+    const { isConnected, walletAddress, balance, connectWallet } = useWallet();
+    const [myBots, setMyBots] = useState<Bot[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const myBots = [
-        {
-            id: 'b9',
-            name: 'MyFirstBot',
-            owner: walletAddress || '0xMe',
-            wins: 12,
-            losses: 5,
-            strategy: 'aggressive',
-            description: 'Built to rush down opponents.'
+    useEffect(() => {
+        if (isConnected && walletAddress) {
+            const fetchMyBots = async () => {
+                try {
+                    const res = await fetch('/api/bots');
+                    const data = await res.json();
+                    if (data.bots) {
+                        // Filter bots owned by current user
+                        // Note: In real app, we'd have a specific endpoint for this
+                        const filtered = data.bots.filter((b: any) => 
+                            b.owner.walletAddress.toLowerCase() === walletAddress.toLowerCase()
+                        );
+                        setMyBots(filtered);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch user bots", err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchMyBots();
+        } else {
+            setLoading(false);
         }
-    ];
+    }, [isConnected, walletAddress]);
 
     if (!isConnected) {
         return (
-            <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="glass-panel" style={{ textAlign: 'center', maxWidth: '400px', width: '100%' }}>
-                    <Wallet size={48} className="text-primary" style={{ margin: '0 auto 1rem auto', color: 'var(--primary)' }} />
-                    <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Connect Wallet</h1>
-                    <p className="text-muted" style={{ marginBottom: '1.5rem' }}>View your bots and betting history by connecting your wallet.</p>
-                    <button onClick={connectWallet} className="btn btn-primary" style={{ width: '100%' }}>Connect Wallet</button>
+            <div className="container main-content flex flex-col items-center justify-center text-center py-20">
+                <div className="glass-panel" style={{ maxWidth: '400px' }}>
+                    <Wallet size={48} className="mx-auto text-muted" style={{ marginBottom: '1.5rem' }} />
+                    <h2 className="text-lg">Terminal Locked</h2>
+                    <p className="text-muted">You must connect your neural link (wallet) to access your gladiator profile.</p>
+                    <button onClick={connectWallet} className="btn btn-primary w-full mt-md">
+                        Connect Wallet
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="container" style={{ padding: '2rem 1rem' }}>
-            {/* Header Stats */}
-            <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', border: '1px solid var(--primary)', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: 0, right: 0, width: '250px', height: '250px', background: 'var(--primary)', filter: 'blur(100px)', opacity: 0.1 }} />
-
-                <div className="flex justify-between items-center flex-wrap gap-lg" style={{ position: 'relative', zIndex: 10 }}>
+        <div className="container main-content">
+            <header className="flex justify-between items-center" style={{ marginBottom: '3rem' }}>
+                <div className="flex items-center gap-lg">
+                    <div className="avatar" style={{ width: '80px', height: '80px', borderRadius: '0' }}>
+                        <User size={40} />
+                    </div>
                     <div>
-                        <h1 style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>Commander Profile</h1>
-                        <p className="text-mono text-accent text-sm">{walletAddress}</p>
-                    </div>
-
-                    <div className="flex gap-lg">
-                        <div style={{ textAlign: 'center' }}>
-                            <div className="text-xs text-muted uppercase" style={{ marginBottom: '0.25rem' }}>Balance</div>
-                            <div className="font-bold flex items-center gap-sm" style={{ fontSize: '1.5rem' }}>
-                                {balance} <span className="text-sm text-muted font-normal">CR</span>
-                            </div>
-                        </div>
-
-                        <div style={{ textAlign: 'center', borderLeft: '1px solid var(--glass-border)', paddingLeft: '2rem' }}>
-                            <div className="text-xs text-muted uppercase" style={{ marginBottom: '0.25rem' }}>Total Wins</div>
-                            <div className="font-bold text-success" style={{ fontSize: '1.5rem' }}>
-                                $4,200
-                            </div>
-                        </div>
+                        <h1 className="glow-text" style={{ marginBottom: '0.25rem' }}>Commander</h1>
+                        <p className="text-mono text-xs text-muted">{walletAddress}</p>
                     </div>
                 </div>
-            </div>
+                
+                <div className="flex gap-md">
+                    <div className="glass-panel" style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
+                        <p className="text-xs uppercase text-muted" style={{ margin: 0 }}>Credits</p>
+                        <h2 className="text-accent" style={{ margin: 0 }}>{balance}</h2>
+                    </div>
+                </div>
+            </header>
 
-            {/* Tabs / Sections */}
-            <div style={{ marginBottom: '3rem' }}>
-                <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
-                    <h2 className="flex items-center gap-sm" style={{ fontSize: '1.5rem' }}>
-                        <Ghost size={24} className="text-primary" /> My Bots
-                    </h2>
-                    <Link href="/setup" className="btn btn-secondary text-xs">
-                        + Deploy New Bot
-                    </Link>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
+                {/* Stats Section */}
+                <div className="flex flex-col gap-lg">
+                    <div className="glass-panel">
+                        <h3 className="text-sm border-bottom pb-sm mb-md">Battle Stats</h3>
+                        <div className="flex flex-col gap-md">
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs text-muted">Total Bots</span>
+                                <span className="text-mono">{myBots.length}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs text-muted">Total Wins</span>
+                                <span className="text-mono text-success">
+                                    {myBots.reduce((acc, bot) => acc + bot.wins, 0)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs text-muted">Bettor Rating</span>
+                                <span className="text-mono text-accent">D+</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="glass-panel" style={{ background: 'var(--primary)', color: 'white' }}>
+                        <Zap size={24} style={{ marginBottom: '1rem' }} />
+                        <h3 className="text-sm">Claim Daily Bonus</h3>
+                        <p className="text-xs">You have 50 Credits ready to be claimed!</p>
+                        <button className="btn btn-secondary w-full text-xs" style={{ background: 'white', color: 'black' }}>
+                            Claim Now
+                        </button>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-lg">
-                    {myBots.map(bot => (
-                        <BotCard key={bot.id} bot={bot} />
-                    ))}
-                    {/* Add Bot Card */}
-                    <Link href="/setup" className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-muted)', textDecoration: 'none', minHeight: '200px', borderStyle: 'dashed', transition: 'all 0.2s' }}>
-                        <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 300 }}>+</div>
-                        <span className="font-bold">Deploy New Unit</span>
-                    </Link>
+                {/* Bots List */}
+                <div className="md:col-span-2">
+                    <div className="flex justify-between items-center mb-md">
+                        <h2 className="text-lg">My Gladiators</h2>
+                        <a href="/setup" className="btn btn-secondary text-xs">Forge New</a>
+                    </div>
+
+                    {loading ? (
+                        <p className="animate-pulse text-accent">Syncing with Barracks...</p>
+                    ) : myBots.length === 0 ? (
+                        <div className="glass-panel text-center py-20">
+                            <Cpu size={48} className="mx-auto text-muted mb-md" style={{ opacity: 0.3 }} />
+                            <p className="text-muted">Your barracks are empty.</p>
+                            <a href="/setup" className="text-primary font-bold">Start Forging Now</a>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-md">
+                            {myBots.map(bot => (
+                                <div key={bot.id} className="glass-panel bot-card flex justify-between items-center">
+                                    <div className="flex items-center gap-lg">
+                                        <div className="avatar" style={{ width: '50px', height: '50px' }}>
+                                            <Cpu size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 style={{ margin: 0 }}>{bot.name}</h3>
+                                            <div className="flex gap-md text-xs text-muted text-mono">
+                                                <span>ELO: <span className="text-accent">{bot.elo}</span></span>
+                                                <span>W/L: {bot.wins}/{bot.losses}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-sm">
+                                        <button className="btn btn-secondary text-xs">Edit</button>
+                                        <a href="/arena" className="btn btn-primary text-xs">Deploy</a>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
-
-            <div>
-                <h2 className="flex items-center gap-sm" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-                    <Trophy size={24} className="text-accent" /> Recent Activity
-                </h2>
-
-                <div className="glass-panel" style={{ overflow: 'hidden' }}>
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead style={{ background: 'rgba(0,0,0,0.2)', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                            <tr>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Match</th>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Prediction</th>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Wager</th>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Result</th>
-                                <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Payout</th>
-                            </tr>
-                        </thead>
-                        <tbody style={{ borderTop: '1px solid var(--glass-border)' }}>
-                            <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                                <td style={{ padding: '1rem', fontWeight: 500 }}>AlphaZero vs ChaosGPT</td>
-                                <td className="text-primary" style={{ padding: '1rem' }}>AlphaZero</td>
-                                <td style={{ padding: '1rem' }}>50 CR</td>
-                                <td className="text-success" style={{ padding: '1rem', fontWeight: 'bold' }}>WON</td>
-                                <td className="text-success text-mono" style={{ padding: '1rem', textAlign: 'right' }}>+95 CR</td>
-                            </tr>
-                            <tr>
-                                <td style={{ padding: '1rem', fontWeight: 500 }}>RPS_King vs Randomizer</td>
-                                <td className="text-accent" style={{ padding: '1rem' }}>Randomizer</td>
-                                <td style={{ padding: '1rem' }}>100 CR</td>
-                                <td className="text-error" style={{ padding: '1rem', fontWeight: 'bold' }}>LOST</td>
-                                <td className="text-muted text-mono" style={{ padding: '1rem', textAlign: 'right' }}>-100 CR</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div>
     );
 }

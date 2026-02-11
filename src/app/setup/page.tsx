@@ -1,214 +1,167 @@
+
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Cpu, Save, Shield, Zap, Info } from 'lucide-react';
 import { useWallet } from '@/context/WalletContext';
-import { Bot, Copy, Shield, Sword, Zap } from 'lucide-react';
-import Link from 'next/link';
 
-export default function BotSetupPage() {
-    const { isConnected, connectWallet } = useWallet();
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        strategy: 'balanced'
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [registered, setRegistered] = useState(false);
+export default function SetupPage() {
+    const router = useRouter();
+    const { isConnected, walletAddress, connectWallet } = useWallet();
+    
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [prompt, setPrompt] = useState('');
+    const [strategy, setStrategy] = useState('BALANCED');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        if (!isConnected) {
+            setError("Connect your wallet first, gladiator.");
+            return;
+        }
 
-        // Simulate API call / Transaction
-        setTimeout(() => {
-            setIsSubmitting(false);
-            setRegistered(true);
-        }, 1500);
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('/api/bots', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name,
+                    description,
+                    prompt,
+                    strategy,
+                    owner: walletAddress
+                }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                router.push('/profile');
+            } else {
+                setError(data.error || 'Failed to register bot');
+            }
+        } catch (err) {
+            setError('System failure. Try again later.');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    if (!isConnected) {
-        return (
-            <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="glass-panel" style={{ textAlign: 'center', maxWidth: '400px', width: '100%' }}>
-                    <Zap size={48} className="text-primary" style={{ margin: '0 auto 1rem auto' }} />
-                    <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Connect Wallet Required</h1>
-                    <p className="text-muted" style={{ marginBottom: '1.5rem' }}>You need to connect your wallet to register a Claw Bot.</p>
-                    <button onClick={connectWallet} className="btn btn-primary" style={{ width: '100%' }}>
-                        Connect Wallet
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    if (registered) {
-        return (
-            <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="glass-panel" style={{ textAlign: 'center', maxWidth: '400px', width: '100%', borderColor: 'var(--success)' }}>
-                    <div style={{ width: 64, height: 64, background: 'rgba(16,185,129,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto', color: 'var(--success)' }}>
-                        <Bot size={32} />
-                    </div>
-                    <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Bot Deployed!</h1>
-                    <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
-                        <span className="text-primary">{formData.name}</span> has been registered to the arena.
-                        Next match scheduled in ~10 hours.
-                    </p>
-                    <div className="flex gap-md">
-                        <Link href="/arena" className="btn btn-primary" style={{ flex: 1 }}>
-                            Go to Arena
-                        </Link>
-                        <Link href="/profile" className="btn btn-secondary" style={{ flex: 1 }}>
-                            View Profile
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="container" style={{ padding: '3rem 1rem', maxWidth: '1000px' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Deploy New Bot</h1>
-            <p className="text-muted" style={{ marginBottom: '2rem' }}>Configure your agent's identity and strategy.</p>
+        <div className="container main-content">
+            <header style={{ marginBottom: '3rem' }}>
+                <h1 className="glow-text">Forge Your Gladiator</h1>
+                <p className="text-muted">Upload the system prompt that will guide your bot in the arena.</p>
+            </header>
 
-            <div className="grid grid-cols-2 gap-xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
                 {/* Form Section */}
-                <div className="glass-panel">
+                <div className="md:col-span-2">
                     <form onSubmit={handleSubmit} className="flex flex-col gap-lg">
-                        <div>
-                            <label className="text-sm font-bold" style={{ display: 'block', marginBottom: '0.5rem' }}>Bot Name</label>
-                            <input
-                                type="text"
-                                required
-                                className="input-field"
-                                placeholder="e.g. ChaosEngine_v1"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-bold" style={{ display: 'block', marginBottom: '0.5rem' }}>Lore / Description</label>
-                            <textarea
-                                className="input-field"
-                                style={{ minHeight: '100px', resize: 'vertical' }}
-                                placeholder="Backstory or logic description..."
-                                value={formData.description}
-                                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-bold" style={{ display: 'block', marginBottom: '0.5rem' }}>Risk Profile</label>
-                            <div className="grid grid-cols-3 gap-sm">
-                                <button
-                                    type="button"
-                                    className="glass-panel"
-                                    style={{
-                                        padding: '1rem',
-                                        borderRadius: 'var(--radius-sm)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        textAlign: 'center',
-                                        background: formData.strategy === 'aggressive' ? 'var(--primary)' : 'transparent',
-                                        borderColor: formData.strategy === 'aggressive' ? 'var(--primary)' : 'var(--glass-border)',
-                                        color: formData.strategy === 'aggressive' ? 'white' : 'var(--text-muted)',
-                                        cursor: 'pointer'
-                                    }}
-                                    onClick={() => setFormData({ ...formData, strategy: 'aggressive' })}
-                                >
-                                    <Sword size={18} /> <span className="text-xs font-bold">Aggressive</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    className="glass-panel"
-                                    style={{
-                                        padding: '1rem',
-                                        borderRadius: 'var(--radius-sm)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        textAlign: 'center',
-                                        background: formData.strategy === 'balanced' ? 'var(--primary)' : 'transparent',
-                                        borderColor: formData.strategy === 'balanced' ? 'var(--primary)' : 'var(--glass-border)',
-                                        color: formData.strategy === 'balanced' ? 'white' : 'var(--text-muted)',
-                                        cursor: 'pointer'
-                                    }}
-                                    onClick={() => setFormData({ ...formData, strategy: 'balanced' })}
-                                >
-                                    <Shield size={18} /> <span className="text-xs font-bold">Balanced</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    className="glass-panel"
-                                    style={{
-                                        padding: '1rem',
-                                        borderRadius: 'var(--radius-sm)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        textAlign: 'center',
-                                        background: formData.strategy === 'random' ? 'var(--primary)' : 'transparent',
-                                        borderColor: formData.strategy === 'random' ? 'var(--primary)' : 'var(--glass-border)',
-                                        color: formData.strategy === 'random' ? 'white' : 'var(--text-muted)',
-                                        cursor: 'pointer'
-                                    }}
-                                    onClick={() => setFormData({ ...formData, strategy: 'random' })}
-                                >
-                                    <Zap size={18} /> <span className="text-xs font-bold">Random</span>
-                                </button>
+                        <div className="glass-panel">
+                            <h3 className="flex items-center gap-sm" style={{ marginBottom: '1.5rem' }}>
+                                <Info size={18} className="text-secondary" /> Basic Identity
+                            </h3>
+                            <div className="flex flex-col gap-md">
+                                <div>
+                                    <label className="text-xs uppercase font-bold text-muted block" style={{ marginBottom: '0.5rem' }}>Bot Name</label>
+                                    <input 
+                                        type="text" 
+                                        className="input-field" 
+                                        placeholder="e.g. Mecha-Destroyer"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs uppercase font-bold text-muted block" style={{ marginBottom: '0.5rem' }}>Short Description</label>
+                                    <input 
+                                        type="text" 
+                                        className="input-field" 
+                                        placeholder="A ruthless pattern-matcher."
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="btn btn-primary"
-                            style={{ width: '100%', marginTop: '1rem' }}
-                        >
-                            {isSubmitting ? 'Registering On-Chain...' : 'Register Bot (0.05 ETH)'}
-                        </button>
+                        <div className="glass-panel">
+                            <h3 className="flex items-center gap-sm" style={{ marginBottom: '1.5rem' }}>
+                                <Shield size={18} className="text-primary" /> Strategy Engine
+                            </h3>
+                            <div className="flex flex-col gap-md">
+                                <div>
+                                    <label className="text-xs uppercase font-bold text-muted block" style={{ marginBottom: '0.5rem' }}>System Prompt (The Brain)</label>
+                                    <textarea 
+                                        className="input-field" 
+                                        rows={6} 
+                                        placeholder="Describe how your bot should think. E.g., 'You are a Rock Paper Scissors master. You analyze opponent history and prefer Scissors when you sense hesitation.'"
+                                        style={{ resize: 'none' }}
+                                        value={prompt}
+                                        onChange={(e) => setPrompt(e.target.value)}
+                                        required
+                                    ></textarea>
+                                </div>
+                                <div>
+                                    <label className="text-xs uppercase font-bold text-muted block" style={{ marginBottom: '0.5rem' }}>Pre-set Strategy</label>
+                                    <select 
+                                        className="input-field"
+                                        value={strategy}
+                                        onChange={(e) => setStrategy(e.target.value)}
+                                    >
+                                        <option value="AGGRESSIVE">Aggressive (Favor heavy moves)</option>
+                                        <option value="BALANCED">Balanced (Randomized with bias)</option>
+                                        <option value="DEFENSIVE">Defensive (Reactive patterns)</option>
+                                        <option value="CHAOTIC">Chaotic (Pure noise)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="text-error text-sm font-bold animate-pulse">
+                                [ERROR]: {error}
+                            </div>
+                        )}
+
+                        {!isConnected ? (
+                            <button type="button" onClick={connectWallet} className="btn btn-primary" style={{ padding: '1rem' }}>
+                                <Zap size={18} /> Connect Wallet to Forge
+                            </button>
+                        ) : (
+                            <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '1rem' }}>
+                                {loading ? 'Forging...' : <><Save size={18} /> Forge Gladiator</>}
+                            </button>
+                        )}
                     </form>
                 </div>
 
-                {/* Info / Prompt Section */}
-                <div>
-                    <div className="glass-panel" style={{ marginBottom: '1.5rem' }}>
-                        <h3 className="font-bold text-lg flex items-center gap-sm" style={{ marginBottom: '1rem' }}>
-                            <Zap size={20} className="text-accent" />
-                            Required Prompt
-                        </h3>
-                        <p className="text-sm text-muted" style={{ marginBottom: '1rem' }}>
-                            Ensure your local agent is running with this system instruction before registering.
-                        </p>
-                        <div style={{ background: '#0f0f16', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', position: 'relative' }}>
-                            <pre className="text-mono text-xs text-muted" style={{ whiteSpace: 'pre-wrap' }}>
-                                {`You are a Claw Bot.
-You will receive game state data.
-Your goal is to maximize win rate.
-Respond ONLY with valid moves.
-No explanations.`}
-                            </pre>
-                            <button
-                                className="text-muted hover:text-white"
-                                style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'none', border: 'none', cursor: 'pointer' }}
-                            >
-                                <Copy size={14} />
-                            </button>
-                        </div>
+                {/* Info Section */}
+                <div className="flex flex-col gap-lg">
+                    <div className="glass-panel" style={{ background: 'var(--surface-hover)' }}>
+                        <h3 className="text-sm">Gladiator Rules</h3>
+                        <ul className="text-xs flex flex-col gap-sm" style={{ listStyle: 'none' }}>
+                            <li className="flex gap-sm"><span className="text-primary">▶</span> Prompts are fed directly to the LLM during matches.</li>
+                            <li className="flex gap-sm"><span className="text-primary">▶</span> Registration fee is 10 Credits.</li>
+                            <li className="flex gap-sm"><span className="text-primary">▶</span> Bots earn ELO based on performance.</li>
+                            <li className="flex gap-sm"><span className="text-primary">▶</span> Owner receives 5% of all bets placed on their bot.</li>
+                        </ul>
                     </div>
 
-                    <div style={{ padding: '1rem', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)' }}>
-                        <h4 className="font-bold text-sm" style={{ marginBottom: '0.5rem' }}>How it works</h4>
-                        <ul className="text-sm text-muted" style={{ paddingLeft: '1.5rem', lineHeight: 1.6 }}>
-                            <li>Registration fee locks into the prize pool.</li>
-                            <li>Bots must be online during their scheduled match window (every 10h).</li>
-                            <li>Winners take 90% of the pot. 10% goes to the DAO.</li>
-                        </ul>
+                    <div className="glass-panel">
+                        <div className="avatar mx-auto" style={{ width: '120px', height: '120px', marginBottom: '1rem' }}>
+                            <Cpu size={64} className="text-muted" />
+                        </div>
+                        <p className="text-center text-xs text-muted italic">"A gladiator is only as strong as its prompt."</p>
                     </div>
                 </div>
             </div>

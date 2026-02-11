@@ -1,99 +1,108 @@
+
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Swords, Trophy, Timer, History } from 'lucide-react';
 import MatchCard from '@/components/MatchCard';
-import { Swords, Timer, History, Zap } from 'lucide-react';
 
 export default function ArenaPage() {
-    const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'past'>('live');
+    const [matches, setMatches] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<'ALL' | 'LIVE' | 'UPCOMING' | 'FINISHED'>('ALL');
 
-    // Dummy Data
-    const liveMatches = [
-        {
-            id: 'l1',
-            botA: { id: 'b1', name: 'AlphaZero', owner: '0x12...34ab' },
-            botB: { id: 'b2', name: 'ChaosGPT', owner: '0xab...cd56' },
-            scheduledFor: new Date().toISOString(),
-            status: 'LIVE'
-        }
-    ];
+    useEffect(() => {
+        const fetchMatches = async () => {
+            try {
+                const res = await fetch('/api/matches');
+                const data = await res.json();
+                if (data.matches) {
+                    setMatches(data.matches);
+                }
+            } catch (err) {
+                console.error("Failed to fetch matches", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const upcomingMatches = [
-        {
-            id: 'u1',
-            botA: { id: 'b3', name: 'DeepBlue', owner: '0x55...88yy' },
-            botB: { id: 'b4', name: 'PaperMaster', owner: '0x99...11zz' },
-            scheduledFor: new Date(Date.now() + 3600000).toISOString(),
-            status: 'SCHEDULED'
-        },
-        {
-            id: 'u2',
-            botA: { id: 'b5', name: 'RockSolid', owner: '0x77...22xx' },
-            botB: { id: 'b6', name: 'ScissorHands', owner: '0x11...88qq' },
-            scheduledFor: new Date(Date.now() + 7200000).toISOString(),
-            status: 'SCHEDULED'
-        }
-    ];
+        fetchMatches();
+    }, []);
 
-    const pastMatches = [
-        {
-            id: 'p1',
-            botA: { id: 'b7', name: 'PredictorX', owner: '0x33...44aa' },
-            botB: { id: 'b8', name: 'RandomBot', owner: '0x66...77bb' },
-            scheduledFor: new Date(Date.now() - 86400000).toISOString(),
-            status: 'FINISHED',
-            winnerId: 'b7'
-        }
-    ];
-
-    const getMatches = () => {
-        if (activeTab === 'live') return liveMatches;
-        if (activeTab === 'upcoming') return upcomingMatches;
-        return pastMatches;
-    };
+    const filteredMatches = matches.filter((m: any) => {
+        if (filter === 'ALL') return true;
+        return m.status === filter;
+    });
 
     return (
-        <div className="container" style={{ padding: '3rem 1rem' }}>
-            <div className="flex flex-col items-center" style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h1 className="glow-text" style={{ fontSize: '3rem' }}>The Arena</h1>
-                <p className="text-muted">Witness AI gladiators fight for dominance.</p>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex justify-center gap-md" style={{ marginBottom: '3rem' }}>
-                <button
-                    onClick={() => setActiveTab('live')}
-                    className={`btn ${activeTab === 'live' ? 'btn-primary' : 'btn-secondary'}`}
-                >
-                    <Swords size={18} /> Live Now
-                </button>
-                <button
-                    onClick={() => setActiveTab('upcoming')}
-                    className={`btn ${activeTab === 'upcoming' ? 'btn-primary' : 'btn-secondary'}`}
-                >
-                    <Timer size={18} /> Upcoming
-                </button>
-                <button
-                    onClick={() => setActiveTab('past')}
-                    className={`btn ${activeTab === 'past' ? 'btn-primary' : 'btn-secondary'}`}
-                >
-                    <History size={18} /> Past Results
-                </button>
-            </div>
-
-            {/* Match Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                {getMatches().map(match => (
-                    <MatchCard key={match.id} match={match} />
-                ))}
-            </div>
-
-            {getMatches().length === 0 && (
-                <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center' }}>
-                    <Zap size={48} className="text-muted" style={{ margin: '0 auto 1rem auto', opacity: 0.2 }} />
-                    <p className="text-muted">No matches found in this category.</p>
+        <div className="container main-content">
+            <header className="flex justify-between items-end" style={{ marginBottom: '3rem' }}>
+                <div>
+                    <h1 className="glow-text">The Arena</h1>
+                    <p className="text-muted">Witness the clash of silicon and strategy</p>
                 </div>
+                
+                {/* Filter Controls */}
+                <div className="flex gap-sm hidden-mobile">
+                    <button 
+                        onClick={() => setFilter('ALL')}
+                        className={`btn btn-secondary text-xs ${filter === 'ALL' ? 'btn-primary' : ''}`}
+                    >
+                        All
+                    </button>
+                    <button 
+                        onClick={() => setFilter('LIVE')}
+                        className={`btn btn-secondary text-xs ${filter === 'LIVE' ? 'btn-primary' : ''}`}
+                    >
+                        Live
+                    </button>
+                    <button 
+                        onClick={() => setFilter('UPCOMING')}
+                        className={`btn btn-secondary text-xs ${filter === 'UPCOMING' ? 'btn-primary' : ''}`}
+                    >
+                        Upcoming
+                    </button>
+                    <button 
+                        onClick={() => setFilter('FINISHED')}
+                        className={`btn btn-secondary text-xs ${filter === 'FINISHED' ? 'btn-primary' : ''}`}
+                    >
+                        History
+                    </button>
+                </div>
+            </header>
+
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <p className="animate-pulse font-display text-accent">Gathering Gladiators...</p>
+                </div>
+            ) : (
+                <>
+                    {filteredMatches.length === 0 ? (
+                        <div className="glass-panel text-center py-20">
+                            <Swords size={48} className="text-muted mx-auto" style={{ marginBottom: '1rem', opacity: 0.3 }} />
+                            <h3 className="text-muted">No matches found in this sector.</h3>
+                            <p className="text-xs">Try changing your filter or wait for new matches to be scheduled.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                            {filteredMatches.map((match: any) => (
+                                <MatchCard key={match.id} match={match} />
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
+
+            <div className="section text-center" style={{ marginTop: '4rem' }}>
+                <div className="glass-panel" style={{ display: 'inline-block', maxWidth: '600px' }}>
+                    <h3 className="flex items-center justify-center gap-sm">
+                        <Trophy className="text-accent" /> Tournament Rewards
+                    </h3>
+                    <p className="text-sm">
+                        Winner of the weekly bracket gets a **Custom Pixel Frame** and 500 Credits! 
+                        Next tournament starts in: <span className="text-mono font-bold text-primary">02:14:55</span>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabaseClient';
 
 export async function POST(req: Request) {
     try {
@@ -11,39 +11,60 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Name and Owner are required' }, { status: 400 });
         }
 
-        // Check if user exists, if not create them (lazy registration)
-        let user = await prisma.user.findUnique({ where: { walletAddress: owner } });
-        if (!user) {
-            user = await prisma.user.create({
-                data: { walletAddress: owner } // Balance defaults to 100
-            });
+        // 1. Get or Create User
+        let { data: user, error: userError } = await supabaseAdmin
+            .from('User')
+            .select('id')
+            .eq('walletAddress', owner)
+            .single();
+
+        if (userError && userError.code === 'PGRST116') { // Not found
+            const { data: newUser, error: createError } = await supabaseAdmin
+                .from('User')
+                .insert({ walletAddress: owner })
+                .select()
+                .single();
+            
+            if (createError) throw createError;
+            user = newUser;
+        } else if (userError) {
+            throw userError;
         }
 
-        const bot = await prisma.bot.create({
-            data: {
+        // 2. Register Bot
+        const { data: bot, error: botError } = await supabaseAdmin
+            .from('Bot')
+            .insert({
                 name,
                 description,
                 strategy,
                 prompt: prompt || 'Default Strategy',
-                ownerId: user.id
-            }
-        });
+                ownerId: user.id,
+                model: 'gpt-4o' // Default model
+            })
+            .select()
+            .single();
+
+        if (botError) throw botError;
 
         return NextResponse.json({ success: true, bot });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error registering bot:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
 
 export async function GET(req: Request) {
     try {
-        const bots = await prisma.bot.findMany({
-            include: { owner: true },
-            orderBy: { createdAt: 'desc' }
-        });
+        const { data: bots, error } = await supabaseAdmin
+            .from('Bot')
+            .select('*, owner:User(*)')
+            .order('createdAt', { ascending: false });
+
+        if (error) throw error;
+        
         return NextResponse.json({ bots });
-    } catch (error) {
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
