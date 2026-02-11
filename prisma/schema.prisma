@@ -1,66 +1,164 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// MoChad AI Gladiator Arena Database Schema
+// Optimized for Supabase (PostgreSQL)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
+// Enums for standardizing values
+enum GameType {
+  ROCK_PAPER_SCISSORS
+  COIN_FLIP
+  NUMBER_DUEL
+  GRID_CAPTURE
+  TURN_BASED_RPG
+  TRUST_AND_BETRAY
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  CANCELLED
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
+  REFUNDED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  BET_PLACED
+  BET_WON
+  BOT_EARNINGS
+  SYSTEM_BONUS
+}
+
+// User Model: Represents a player/bettor
 model User {
-  id            String   @id @default(cuid())
-  walletAddress String   @unique
-  balance       Float    @default(100.0) // Start with 100 fake credits
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id            String   @id @default(uuid())
+  walletAddress String   @unique // Public key
+  username      String?  // Optional nickname
+  avatarUrl     String?  // Profile picture
+  
+  // Financials
+  balance       Float    @default(100.0) // Starting credits/ETH equivalent
+  
+  // Relations
   bots          Bot[]
   bets          Bet[]
+  transactions  Transaction[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([walletAddress])
 }
 
+// Bot Model: An autonomous AI agent
 model Bot {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id])
-  prompt      String   // The system prompt or instruction
-  strategy    String?  // 'aggressive', 'balanced', etc.
+  prompt      String   // The system prompt defining behavior/personality
+  strategy    String?  // High-level strategy description
+  model       String   @default("gpt-4o") // e.g., 'gpt-4o', 'claude-3-5-sonnet'
+  
+  // Stats
   wins        Int      @default(0)
   losses      Int      @default(0)
+  draws       Int      @default(0)
+  elo         Int      @default(1000) // Ranking
+  totalEarnings Float  @default(0.0)
+
+  // Relations
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
   matchesAsA  Match[]  @relation("BotA")
   matchesAsB  Match[]  @relation("BotB")
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([elo])
 }
 
+// Match Model: A duel between two bots
 model Match {
-  id           String   @id @default(cuid())
+  id           String      @id @default(uuid())
+  gameType     GameType    @default(ROCK_PAPER_SCISSORS)
+  status       MatchStatus @default(SCHEDULED)
+  scheduledFor DateTime    @default(now())
+  
+  // Participants
   botAId       String
   botBId       String
-  botA         Bot      @relation("BotA", fields: [botAId], references: [id])
-  botB         Bot      @relation("BotB", fields: [botBId], references: [id])
-  gameType     String   @default("RPS") // 'RPS', 'COIN_FLIP'
-  winnerId     String?  // Null if draw or not finished
-  status       String   @default("SCHEDULED") // SCHEDULED, LIVE, FINISHED
-  scheduledFor DateTime
-  resultData   String?  // JSON string of moves/logs
+  botA         Bot         @relation("BotA", fields: [botAId], references: [id])
+  botB         Bot         @relation("BotB", fields: [botBId], references: [id])
+  
+  // Outcome
+  winnerId     String?     // Null if draw or ongoing
+  resultData   Json?       // Full game logs/moves for replay
+  logs         String?     // Summary logs (text)
+  
+  // Betting
+  bettingPool  Float       @default(0.0)
   bets         Bet[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([status])
+  @@index([scheduledFor])
 }
 
+// Bet Model: A wager on a match outcome
 model Bet {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  matchId   String
-  match     Match    @relation(fields: [matchId], references: [id])
+  id        String    @id @default(uuid())
   amount    Float
-  prediction String  // 'BotA', 'BotB' (or ID of winner)
-  status    String   @default("PENDING") // PENDING, WON, LOST, REFUNDED
-  payout    Float?   // Null until settled
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  prediction String   // 'BotA', 'BotB', or Bot ID
+  odds      Float     @default(1.0) // Odds at time of placement
+  status    BetStatus @default(PENDING)
+  payout    Float?    // Calculated winnings
+  
+  // Relations
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  matchId   String
+  match     Match     @relation(fields: [matchId], references: [id])
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([matchId])
+}
+
+// Transaction Model: Ledger of credit movements
+model Transaction {
+  id          String          @id @default(uuid())
+  amount      Float
+  type        TransactionType
+  description String?
+  referenceId String?         // Match ID or Bet ID for context
+  
+  // Relations
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  
+  createdAt   DateTime        @default(now())
+
+  @@index([userId])
+  @@index([type])
 }
